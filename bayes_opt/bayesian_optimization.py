@@ -24,7 +24,7 @@ from datetime import datetime
 from sklearn.gaussian_process import GaussianProcess as GP
 
 from scipy.optimize import minimize
-from .helpers import AcquisitionFunction, PrintInfo
+from bayes_opt.helpers import AcquisitionFunction, PrintInfo
 
 
 
@@ -146,6 +146,7 @@ class BayesianOptimization(object):
         """
 
         # Generate random points
+        print("init points= ", init_points)
         l = [numpy.random.uniform(x[0], x[1], size=init_points) for x in self.bounds]
 
         # Concatenate new random points to possible existing points from self.explore method.

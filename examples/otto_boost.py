@@ -75,6 +75,17 @@ if __name__ == "__main__":
                                       'colsample_bytree': (0.7, 0.8)
                                      })
 
+    xgboostBO.explore({'max_depth': [2],
+                       'learning_rate': [0.1],
+                       'n_estimators': [250],
+                       'gamma': [1.],
+                       'min_child_weight': [2],
+                       'max_delta_step': [0],
+                       'subsample': [0.7],
+                       'colsample_bytree': [0.8]
+    })
+
+
     xgboostBO.maximize()
     print('-'*53)
 
