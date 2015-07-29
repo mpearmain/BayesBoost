@@ -33,14 +33,14 @@ def load_data(path_train = DATA_TRAIN_PATH, path_test = DATA_TEST_PATH):
 def xgboostcv(max_depth,
               learning_rate,
               n_estimators,
-              silent,
               objective,
-              nthread,
               gamma,
               min_child_weight,
               max_delta_step,
               subsample,
               colsample_bytree,
+              silent =False,
+              nthread = -1,
               seed = 1234):
     return cross_val_score(XGBClassifier(max_depth = max_depth,
                                          learning_rate = learning_rate,
@@ -67,27 +67,14 @@ if __name__ == "__main__":
                                      {'max_depth': (1, 10),
                                       'learning_rate': (0.1, 0.3),
                                       'n_estimators': (100, 250),
-                                      'silent': (False),
                                       'objective': ("binary:logistic"),
-                                      'nthread': (-1),
                                       'gamma': (1., 0.1),
                                       'min_child_weight': (2, 3),
                                       'max_delta_step': (0, 0.1),
                                       'subsample': (0.7, 0.8),
                                       'colsample_bytree': (0.7, 0.8)
                                      })
-    xgboostBO.explore( {'max_depth': (1, 10),
-                        'learning_rate': (0.1, 0.3),
-                        'n_estimators': (100, 250),
-                        'silent': (False),
-                        'objective': ("binary:logistic"),
-                        'nthread': (-1),
-                        'gamma': (1., 0.1),
-                        'min_child_weight': (2, 3),
-                        'max_delta_step': (0, 0.1),
-                        'subsample': (0.7, 0.8),
-                        'colsample_bytree': (0.7, 0.8)
-    })
+
     xgboostBO.maximize()
     print('-'*53)
 
