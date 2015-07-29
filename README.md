@@ -17,6 +17,7 @@ Dependencies:
 * Scipy
 * Numpy
 * Scikit-Learn
+* xgboost (https://github.com/dmlc/xgboost)
 
 References:
 * http://papers.nips.cc/paper/4522-practical-bayesian-optimization-of-machine-learning-algorithms.pdf
