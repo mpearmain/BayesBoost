@@ -41,7 +41,7 @@ def acq_max(ac, gp, ymax, restarts, bounds):
 
     :param ymax: The current maximum known value of the target function.
 
-    :param restarts: The number of times minimation if to be repeated. Larger number of restarts
+    :param restarts: The number of times minimization is to be repeated. Larger number of restarts
                      improves the chances of finding the true maxima.
 
     :param bounds: The variables bounds to limit the search of the acq max.
