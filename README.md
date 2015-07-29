@@ -13,6 +13,9 @@ Example 1. is based on the otto dataset from Kaggle, this remains in memory.
 Example 2. is based on Avazu click prediction dataset from Kaggle and requires the 'external' memory version of xgboost.
 (https://www.kaggle.com/c/avazu-ctr-prediction)
 
+### Run
+To get this running create a data/otto and data/avazu dir and download the datasets into the respective directories and unzip / untar the files.
+
 Dependencies:
 * Scipy
 * Numpy
