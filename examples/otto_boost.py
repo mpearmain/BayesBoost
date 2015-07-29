@@ -9,8 +9,6 @@ from sklearn.cross_validation import cross_val_score
 from xgboost import XGBClassifier
 from bayes_opt import BayesianOptimization
 
-XGBClassifier(  )
-
 DATA_TRAIN_PATH = 'data/otto/train.csv'
 DATA_TEST_PATH = 'data/otto/test.csv'
 
