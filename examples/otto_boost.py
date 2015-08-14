@@ -37,6 +37,7 @@ def xgboostcv(max_depth,
               min_child_weight,
               max_delta_step,
               subsample,
+              colsample_bytree,
               silent =True,
               nthread = -1,
               seed = 1234):
@@ -49,10 +50,12 @@ def xgboostcv(max_depth,
                                          min_child_weight = min_child_weight,
                                          max_delta_step = max_delta_step,
                                          subsample = subsample,
-                                         seed = seed),
+                                         colsample_bytree = colsample_bytree,
+                                         seed = seed,
+                                         objective = "multi:softprob"),
                            train,
                            labels,
-                           'log_loss',
+                           "log_loss",
                            cv=5).mean()
 
 if __name__ == "__main__":
@@ -60,13 +63,14 @@ if __name__ == "__main__":
     train, labels, test, _, _ = load_data()
 
     xgboostBO = BayesianOptimization(xgboostcv,
-                                     {'max_depth': (1, 10),
-                                      'learning_rate': (0.1, 0.3),
-                                      'n_estimators': (10, 25),
-                                      'gamma': (1., 0.1),
-                                      'min_child_weight': (2, 3),
+                                     {'max_depth': (5, 10),
+                                      'learning_rate': (0.01, 0.3),
+                                      'n_estimators': (50, 1000),
+                                      'gamma': (1., 0.01),
+                                      'min_child_weight': (2, 10),
                                       'max_delta_step': (0, 0.1),
-                                      'subsample': (0.7, 0.8)
+                                      'subsample': (0.7, 0.8),
+                                      'colsample_bytree' :(0.5, 0.99)
                                      })
 
     xgboostBO.maximize()
