@@ -37,20 +37,18 @@ def xgboostcv(max_depth,
               min_child_weight,
               max_delta_step,
               subsample,
-              colsample_bytree,
               silent =True,
               nthread = -1,
               seed = 1234):
-    return cross_val_score(XGBClassifier(max_depth = max_depth,
+    return cross_val_score(XGBClassifier(max_depth = int(max_depth),
                                          learning_rate = learning_rate,
-                                         n_estimators = n_estimators,
+                                         n_estimators = int(n_estimators),
                                          silent = silent,
                                          nthread = nthread,
-                                         gamma = gamma,
+                                         gamma = int(gamma),
                                          min_child_weight = min_child_weight,
                                          max_delta_step = max_delta_step,
                                          subsample = subsample,
-                                         colsample_bytree = colsample_bytree,
                                          seed = seed),
                            train,
                            labels,
@@ -68,20 +66,8 @@ if __name__ == "__main__":
                                       'gamma': (1., 0.1),
                                       'min_child_weight': (2, 3),
                                       'max_delta_step': (0, 0.1),
-                                      'subsample': (0.7, 0.8),
-                                      'colsample_bytree': (0.7, 0.8)
+                                      'subsample': (0.7, 0.8)
                                      })
-
-    xgboostBO.explore({'max_depth': [2],
-                       'learning_rate': [0.1],
-                       'n_estimators': [250],
-                       'gamma': [1.],
-                       'min_child_weight': [2],
-                       'max_delta_step': [0],
-                       'subsample': [0.7],
-                       'colsample_bytree': [0.8]
-    })
-
 
     xgboostBO.maximize()
     print('-'*53)
