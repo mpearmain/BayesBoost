@@ -1,7 +1,7 @@
-__author__ = 'michael.pearmain'
-
 from __future__ import print_function
 from __future__ import division
+
+__author__ = 'michael.pearmain'
 
 import pandas as pd
 import numpy as np
@@ -9,8 +9,8 @@ from sklearn.cross_validation import cross_val_score
 from xgboost import XGBClassifier
 from bayes_opt import BayesianOptimization
 
-DATA_TRAIN_PATH = 'data/otto/train.csv'
-DATA_TEST_PATH = 'data/otto/test.csv'
+DATA_TRAIN_PATH = '../data/otto/train.csv'
+DATA_TEST_PATH = '../data/otto/test.csv'
 
 def load_data(path_train = DATA_TRAIN_PATH, path_test = DATA_TEST_PATH):
     train = pd.read_csv(path_train)
@@ -67,7 +67,7 @@ if __name__ == "__main__":
                                      {'max_depth': (1, 10),
                                       'learning_rate': (0.1, 0.3),
                                       'n_estimators': (100, 250),
-                                      'objective': ("binary:logistic"),
+                                      'objective': "binary:logistic",
                                       'gamma': (1., 0.1),
                                       'min_child_weight': (2, 3),
                                       'max_delta_step': (0, 0.1),

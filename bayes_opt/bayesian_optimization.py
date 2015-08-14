@@ -1,34 +1,15 @@
-'''
-________ Bayesian optimization ________
-
-Issues:
-
-See papers: http://papers.nips.cc/paper/4522-practical-bayesian-optimization-of-machine-learning-algorithms.pdf
-            http://arxiv.org/pdf/1012.2599v1.pdf
-            http://www.gaussianprocess.org/gpml/
-
-for references.
-
-Fernando Nogueira
-'''
-
 from __future__ import print_function
 from __future__ import division
 
 __author__ = 'fnogueira'
 
-
 import numpy
 from datetime import datetime
-
 from sklearn.gaussian_process import GaussianProcess as GP
-
 from scipy.optimize import minimize
-from bayes_opt.helpers import AcquisitionFunction, PrintInfo
+from .helpers import AcquisitionFunction, PrintInfo
 
 
-
-# ----------------------- // ----------------------- # ----------------------- // ----------------------- #
 def acq_max(ac, gp, ymax, restarts, bounds):
     """
     A function to find the maximum of the acquisition function using the 'L-BFGS-B' method.
@@ -41,7 +22,7 @@ def acq_max(ac, gp, ymax, restarts, bounds):
 
     :param ymax: The current maximum known value of the target function.
 
-    :param restarts: The number of times minimization is to be repeated. Larger number of restarts
+    :param restarts: The number of times minimation if to be repeated. Larger number of restarts
                      improves the chances of finding the true maxima.
 
     :param bounds: The variables bounds to limit the search of the acq max.
@@ -91,11 +72,15 @@ def unique_rows(a):
     return ui[reorder]
 
 
-###
-
 class BayesianOptimization(object):
     """
     Bayesian global optimization with Gaussian Process.
+
+    See papers: http://papers.nips.cc/paper/4522-practical-bayesian-optimization-of-machine-learning-algorithms.pdf
+                http://arxiv.org/pdf/1012.2599v1.pdf
+                http://www.gaussianprocess.org/gpml/
+    for references.
+
     """
 
     def __init__(self, f, pbounds, verbose=1):
@@ -146,7 +131,6 @@ class BayesianOptimization(object):
         """
 
         # Generate random points
-        print("init points= ", init_points)
         l = [numpy.random.uniform(x[0], x[1], size=init_points) for x in self.bounds]
 
         # Concatenate new random points to possible existing points from self.explore method.
@@ -180,8 +164,6 @@ class BayesianOptimization(object):
         # Updates the flag
         self.initialized = True
 
-    # ------------------------------ // ---- # ----- // ------------------------------ #
-    # ------------------------------ // ---- # ----- // ------------------------------ #
     def explore(self, points_dict):
         """ Main optimization method.
             Parameters
@@ -206,17 +188,14 @@ class BayesianOptimization(object):
         else:
             raise ValueError('The same number of initialization points must be entered for every parameter.')
 
-
         ################################################
         # Turn into list of lists
-
         all_points = []
         for key in self.keys:
             all_points.append(points_dict[key])
 
         # Take transpose of list
         self.init_points = list(map(list, zip(*all_points)))
-
 
     def initialize(self, points_dict):
         """
@@ -242,7 +221,6 @@ class BayesianOptimization(object):
 
             self.x_init.append(all_points)
 
-
     def set_bounds(self, new_bounds):
         """
         A method that allows changing the lower and upper searching bounds
@@ -260,8 +238,6 @@ class BayesianOptimization(object):
             # Reset all entries, even if the same.
             self.bounds[row] = self.pbounds[key]
 
-
-    # ----------------------- // ----------------------- # ----------------------- // ----------------------- #
     def maximize(self, init_points=5, restarts=50, n_iter=25, acq='ei', **gp_params):
         """
         Main optimization method.
@@ -304,10 +280,12 @@ class BayesianOptimization(object):
 
         # ------------------------------ // ------------------------------ // ------------------------------ #
         # Fitting the gaussian process.
-        gp = GP(theta0=0.01*numpy.ones(self.dim),\
-                thetaU=0.2*numpy.ones(self.dim),\
-                thetaL=0.0005*numpy.ones(self.dim),\
-                random_start=15)
+        # Since scipy 0.16 passing lower and upper bound to theta seems to be
+        # broken. However, there is a lot of development going on around GP
+        # is scikit-learn. So I'll pick the easy route here and simple specify
+        # only theta0.
+        gp = GP(theta0=numpy.random.uniform(0.001, 0.05, self.dim),
+                random_start=25)
 
         gp.set_params(**gp_params)
 
@@ -315,10 +293,8 @@ class BayesianOptimization(object):
         ur = unique_rows(self.X)
         gp.fit(self.X[ur], self.Y[ur])
 
-
         # Finding argmax of the acquisition function.
         x_max = acq_max(ac, gp, ymax, restarts, self.bounds)
-
 
         # ------------------------------ // ------------------------------ // ------------------------------ #
         # Iterative process of searching for the maximum. At each round the most recent x and y values
