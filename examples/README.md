@@ -14,5 +14,6 @@ So steps:
 2. Create a template file - `xgboost-avazu.txt`
 3. Create a python run file. `xgboost-avazu-dist.py`
 4. Convert csv file into LIBSVM format. (I reccomend the helpers from teh excellent Phraug2 repo - https://github.com/zygmuntz/phraug2/blob/master/csv2libsvm.py)
-5. Load data into HDFS (`hadoop fs -put avazu.svm /tmp`)
-6. Run in python and wait for the results.
+5. split the data into training and validation `sort -R train.csv | split -l 6000000` where 6,000,000 is actually train set size and rename
+6. Load data into HDFS (`hadoop fs -put avazu-train.svm /tmp`)
+7. Run in python and wait for the results.
