@@ -1,5 +1,5 @@
 # Running examples.
-All examples should run without a problem and all except the Avazu script should be a little obvious as to what is happening.
+All examples should run without a problem and all except the Avazu script should be obvious as to what is happening.
 
 ## Avazu specific example using HDFS 
 Running the bayesian optimization is especially useful if you are able to use a cluster as it means more threads for XGBoost to use.
