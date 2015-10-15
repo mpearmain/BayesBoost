@@ -1,0 +1,12 @@
+# General Parameters,--> not required we pass parameters via script.
+# can be gbtree or gblinear
+booster = gbtree 
+# choose logistic regression loss function for binary classification
+objective = binary:logistic
+
+# Xgboost Avazu Example - Where is the data?
+# Task Parameters
+# The path of training data
+data = "hdfs://tmp/avazu.libsvm"
+# model file output --> if you need it for predictions
+# model_out = "hdfs://das/tmp/cv-train.model"
