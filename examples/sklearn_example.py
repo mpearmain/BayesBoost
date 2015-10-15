@@ -2,12 +2,9 @@ from __future__ import print_function
 from __future__ import division
 
 from sklearn.datasets import make_classification
-
 from sklearn.cross_validation import cross_val_score
-
 from sklearn.ensemble import RandomForestClassifier as RFC
 from sklearn.svm import SVC
-
 from bayes_opt import BayesianOptimization
 
 # Load data set and target values
