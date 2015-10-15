@@ -7,6 +7,6 @@ objective = binary:logistic
 # Xgboost Avazu Example - Where is the data?
 # Task Parameters
 # The path of training data
-data = "hdfs://tmp/avazu.libsvm"
+data = "hdfs://tmp/avazu.svm"
 # model file output --> if you need it for predictions
-# model_out = "hdfs://das/tmp/cv-train.model"
+# model_out = "hdfs://das/tmp/avazu.model"
