@@ -10,7 +10,7 @@ goes to the original author.
 Example 1. is based on the otto dataset from Kaggle, this remains in memory.
 (https://www.kaggle.com/c/otto-group-product-classification-challenge)
 
-Example 2. is based on Avazu click prediction dataset from Kaggle and requires the 'external' memory version of xgboost.
+Example 2. is based on Avazu click prediction dataset from Kaggle and requires the 'distributed' version of xgboost.
 (https://www.kaggle.com/c/avazu-ctr-prediction)
 
 ### Run
