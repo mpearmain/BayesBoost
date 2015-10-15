@@ -63,12 +63,12 @@ def xgboostcv(max_depth,
       os.remove("avazu.model")
     except OSError:
       pass
-    Popen(["hadoop","fs","-copyToLocal","/tmp/cv-train.model", "."]).communicate()
+    Popen(["hadoop","fs","-copyToLocal","/tmp/avazu.model", "."]).communicate()
     # Delete stored model.
     Popen(["hadoop","fs","-rm","/tmp/avazu.model", "."]).communicate()
     
     # Load Model file
-    bst = xgb.Booster(model_file='cv-train.model')
+    bst = xgb.Booster(model_file='avazu.model')
     preds = bst.predict(dtest)
     y_pred = bst.predict(dtest)
     y_valid = dtest.get_label()
