@@ -81,8 +81,8 @@ if __name__ == "__main__":
     # sort -R train.csv | split -l 6000000  ## where 6,000,000 is actually train set size
     # Rename the resulting files but keep the eval set for prediction.
     # give absolute paths to pass to 'trainer'
-    dtrain = 'hdfs://das/tmp/train-svm'
-    deval  = 'hdfs://das/tmp/eval-svm'
+    dtrain = 'hdfs://tmp/train-svm'
+    deval  = 'hdfs://tmp/eval-svm'
     model_ouput = "hdfs://das/tmp/avazu.model"
     # Local copy of the eval data (very hacky --> need to get the labels)
     dtest = xgb.DMatrix('avazu/eval-svm')
