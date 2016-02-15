@@ -1,138 +1,91 @@
 from __future__ import print_function
 from __future__ import division
-
-import numpy
+import numpy as np
 from datetime import datetime
 from scipy.stats import norm
-from math import exp, fabs, sqrt, log, pi
-
-################################################################################
-################################################################################
-################################ Help Functions ################################
-################################################################################
-################################################################################
-
-################################################################################
-############################# Aquisition Functions #############################
-################################################################################
-
-class AcquisitionFunction(object):
-    '''An object to compute the acquisition functions.'''
 
 
-    def __init__(self, k=1):
-        '''If UCB is to be used, a constant kappa is needed.'''
-        self.kappa = k
+class UtilityFunction(object):
+    """
+    An object to compute the acquisition functions.
+    """
 
-    # ------------------------------ // ------------------------------ #
-    # Methods for single sample calculation.
-    def UCB(self, x, gp, ymax):
+    def __init__(self, kind='ucb', kappa=1.96):
+        """
+        If UCB is to be used, a constant kappa is needed.
+        """
+        self.kappa = kappa
+
+        if kind not in ['ucb', 'ei', 'poi']:
+            err = "The utility function " \
+                  "{} has not been implemented, " \
+                  "please choose one of ucb, ui, or poi.".format(kind)
+            raise NotImplementedError(err)
+        else:
+            self.kind = kind
+
+    def utility(self, x, gp, y_max):
+        if self.kind == 'ucb':
+            return self._ucb(x, gp, self.kappa)
+        if self.kind == 'ei':
+            return self._ei(x, gp, y_max)
+        if self.kind == 'poi':
+            return self._ucb(x, gp, y_max)
+
+    @staticmethod
+    def _ucb(x, gp, kappa):
         mean, var = gp.predict(x, eval_MSE=True)
-        return mean + self.kappa * sqrt(var)
+        return mean + kappa * np.sqrt(var)
 
-    def EI(self, x, gp, ymax):
+    @staticmethod
+    def _ei(x, gp, y_max):
         mean, var = gp.predict(x, eval_MSE=True)
         if var == 0:
             return 0
         else:
-            Z = (mean - ymax)/sqrt(var)
-            return (mean - ymax) * norm.cdf(Z) + sqrt(var) * norm.pdf(Z)
+            z = (mean - y_max)/np.sqrt(var)
+            return (mean - y_max) * norm.cdf(z) + np.sqrt(var) * norm.pdf(z)
 
-    def PoI(self, x, gp, ymax):
+    @staticmethod
+    def _poi(x, gp, y_max):
         mean, var = gp.predict(x, eval_MSE=True)
         if var == 0:
             return 1
         else:
-            Z = (mean - ymax)/sqrt(var)
-            return norm.cdf(Z)
-
-    # ------------------------------ // ------------------------------ #
-    # Methods for bulk calculation.
-    def full_UCB(self, mean, var):
-        mean = mean.reshape(len(mean))
-        
-        return (mean + self.kappa * numpy.sqrt(var)).reshape(len(mean))
+            z = (mean - y_max)/np.sqrt(var)
+            return norm.cdf(z)
 
 
-    def full_EI(self, ymax, mean, var, verbose = False):
-        '''
-        Function to calculate the expected improvement. Robust agains noiseless
-        systems.
-        '''
-        if verbose:
-            print('EI was called with ymax: %f' % ymax)
+def unique_rows(a):
+    """
+    A functions to trim repeated rows that may appear when optimizing.
+    This is necessary to avoid the sklearn GP object from breaking
 
-        ei = numpy.zeros(len(mean))
+    :param a: array to trim repeated rows from
 
-        mean = mean.reshape(len(mean))
-        var = numpy.sqrt(var)
+    :return: mask of unique rows
+    """
 
-        Z = (mean[var > 0] - ymax)/var[var > 0]
+    # Sort array and kep track of where things should go back to
+    order = np.lexsort(a.T)
+    reorder = np.argsort(order)
 
-        ei[var > 0] = (mean[var > 0] - ymax) * norm.cdf(Z) + var[var > 0] * norm.pdf(Z)
+    a = a[order]
+    diff = np.diff(a, axis=0)
+    ui = np.ones(len(a), 'bool')
+    ui[1:] = (diff != 0).any(axis=1)
 
-        return ei
-
-    def full_PoI(self, ymax, mean, var):
-        '''
-        Function to calculate the probability of improvement. In the current implementation
-        it breaks down in the system has no noise (even though it shouldn't!). It can easily
-        be fixed and I will do it later...
-        '''
-        mean = mean.reshape(len(mean))
-        var = numpy.sqrt(var)
-
-        gamma = (mean - ymax)/var
-    
-        return norm.cdf(gamma)
+    return ui[reorder]
 
 
-################################################################################
-################################## Print Info ##################################
-################################################################################
+def print_info(op_start, i, y_max, x_train, y_train, keys):
 
+    np.set_printoptions(precision=4, suppress=True)
+    print('Iteration: %3i | Last sampled value: %11f' % ((i+1), y_train[-1]),
+          '| with parameters: ', dict(zip(keys, x_train[-1])))
+    print('               | Current maximum: %14f | with parameters: ' % y_max,
+          dict(zip(keys, x_train[np.argmax(y_train)])))
 
-class PrintInfo(object):
-    '''A class to take care of the verbosity of the other classes.'''
-    '''Under construction!'''
-
-    def __init__(self, level=0):
-
-        self.lvl = level
-        self.timer = 0
-
-
-    def print_info(self, op_start, i, x_max, ymax, xtrain, ytrain, keys):
-
-        if self.lvl:
-            numpy.set_printoptions(precision=4, suppress=True)
-            print('Iteration: %3i | Last sampled value: %11f' % ((i+1), ytrain[-1]), '| with parameters: ', dict(zip(keys, xtrain[-1])))
-            print('               | Current maximum: %14f | with parameters: ' % ymax, dict(zip(keys, xtrain[numpy.argmax(ytrain)])))
-            
-            minutes, seconds = divmod((datetime.now() - op_start).total_seconds(), 60)
-            print('               | Time taken: %i minutes and %s seconds' % (minutes, seconds))
-            print('')
-
-        else:
-            pass
-
-
-    def print_log(self, op_start, i, x_max, xmins, min_max_ratio, ymax, xtrain, ytrain, keys):
-
-        def return_log(x):
-            return xmins * (10 ** (x * min_max_ratio))
-
-        dict_len = len(keys)
-
-        if self.lvl:
-                
-            numpy.set_printoptions(precision=4, suppress=True)
-            print('Iteration: %3i | Last sampled value: %8f' % ((i+1), ytrain[-1]), '| with parameters: ',  dict(zip(keys, return_log(xtrain[-1])) ))
-            print('               | Current maximum: %11f | with parameters: ' % ymax, dict(zip(keys, return_log( xtrain[numpy.argmax(ytrain)]))))
-
-            minutes, seconds = divmod((datetime.now() - op_start).total_seconds(), 60)
-            print('               | Time taken: %i minutes and %s seconds' % (minutes, seconds))
-            print('')
-
-        else:
-            pass
+    minutes, seconds = divmod((datetime.now() - op_start).total_seconds(), 60)
+    print('               | Time taken: %i minutes and %s seconds' % (minutes, seconds))
+    print('')
